@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-geist: "Geist", sans-serif;
+  --color-primary-50: #ecfdf3;
+  --color-primary-100: #d2f9e1;
+  --color-primary-200: #a8f2c9;
+  --color-primary-300: #70e5ab;
+  --color-primary-400: #55d89b;
+  --color-primary-500: #12b76f;
+  --color-primary-600: #07945a;
+  --color-primary-700: #06764b;
+  --color-primary-800: #075e3c;
+  --color-primary-900: #074d34;
+  --color-primary-950: #032b1e;
+}
+
+@layer base {
+  body,
+  #root {
+    @apply font-geist min-h-dvh;
+  }
+
+  .maxContainer {
+    @apply max-w-[1440px] mx-auto;
+  }
+
+  .paddingContainer {
+    @apply px-4 md:px-6 lg:px-8;
+  }
+}
