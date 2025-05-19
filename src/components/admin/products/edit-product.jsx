@@ -1,18 +1,24 @@
-import { ArrowLeft, Cookie, CupSoda, Hamburger, Upload } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import Button from "../ui/Button";
+import { ArrowLeft, Cookie, CupSoda, Hamburger } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import Button from "../../ui/Button";
+import { productMockData } from "../../../lib/mockdata";
 
-const AddProduct = () => {
+const EditProduct = () => {
+  const { id } = useParams();
   const [formData, setFormData] = useState({
-    name: "",
-    price: "",
-    stock: "",
-    type: "makanan",
-    image: null,
+    id: id,
+    name: "Product 1",
+    price: 100000,
+    stock: 10,
+    type: "minuman",
+    image: "https://placehold.co/100x100",
+    category: "es_kopi",
   });
 
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview, setImagePreview] = useState(
+    "https://placehold.co/100x100"
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -40,7 +46,19 @@ const AddProduct = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsLoading(true);
   };
+
+  useEffect(() => {
+    const product = productMockData.find(
+      (product) => product.id === parseInt(id)
+    );
+
+    if (product) {
+      setFormData(product);
+      setImagePreview(product.image);
+    }
+  }, []);
 
   return (
     <div className="flex flex-col gap-5">
@@ -52,9 +70,7 @@ const AddProduct = () => {
           >
             <ArrowLeft className="size-5 text-gray-500" />
           </Link>
-          <h1 className="text-2xl font-medium text-primary-950">
-            Tambah Produk Baru
-          </h1>
+          <h1 className="text-2xl font-medium text-primary-950">Edit Produk</h1>
         </div>
         <div className="flex gap-2">
           <Link
@@ -142,6 +158,34 @@ const AddProduct = () => {
               required
             />
           </div>
+          <div className="flex flex-col">
+            <label
+              htmlFor="type"
+              className="text-sm font-medium text-gray-700 mb-2"
+            >
+              Kategori
+            </label>
+            <div class="w-full">
+              <div class="relative">
+                <select
+                  class="w-full bg-transparent text-sm border border-gray-300 rounded-lg px-4 py-2 transition-all duration-300 ease appearance-none cursor-pointer h-[42px]"
+                  name="type"
+                  id="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                >
+                  <option value="kopi">Kopi</option>
+                  <option value="es_kopi">Es Kopi</option>
+                  <option value="jus">Jus</option>
+                </select>
+                <img
+                  src="/select.svg"
+                  alt="select"
+                  className="h-5 w-5 ml-1 absolute top-2.5 right-2.5 "
+                />
+              </div>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex flex-col">
               <label
@@ -216,4 +260,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default EditProduct;

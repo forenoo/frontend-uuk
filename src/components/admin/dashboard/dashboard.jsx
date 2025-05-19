@@ -6,14 +6,14 @@ import {
   ShoppingBag,
   Users,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useAuth } from "../../hooks/use-auth";
-import Button from "../ui/Button";
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "../../../hooks/use-auth";
+import Button from "../../ui/Button";
 
 const Dashboard = () => {
-  const { username, role } = useAuth();
+  const { username } = useAuth();
 
-  document.title = "Dashboard | " + (role === "admin" ? "Admin" : "Kasir");
+  document.title = "Dashboard | Admin";
 
   const mockData = [
     {

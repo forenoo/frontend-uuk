@@ -1,23 +1,19 @@
-import { ArrowLeft, Cookie, CupSoda, Hamburger } from "lucide-react";
+import { ArrowLeft, Cookie, CupSoda, Hamburger, Upload } from "lucide-react";
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import Button from "../ui/Button";
+import { Link } from "react-router-dom";
+import Button from "../../ui/Button";
 
-const EditProduct = () => {
-  const { id } = useParams();
+const AddProduct = () => {
   const [formData, setFormData] = useState({
-    id: id,
-    name: "Thai Tea",
-    price: "150000",
-    stock: "50",
-    type: "minuman",
+    name: "",
+    price: "",
+    stock: "",
+    type: "makanan",
+    category: "",
     image: null,
   });
 
-  const [imagePreview, setImagePreview] = useState(
-    "https://placehold.co/100x100"
-  );
-  const [isLoading, setIsLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -44,7 +40,6 @@ const EditProduct = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsLoading(true);
   };
 
   return (
@@ -68,12 +63,8 @@ const EditProduct = () => {
           >
             Batal
           </Link>
-          <Button
-            type="submit"
-            className="flex items-center gap-2"
-            disabled={isLoading}
-          >
-            {isLoading ? "Menyimpan..." : "Simpan Produk"}
+          <Button type="submit" className="flex items-center gap-2">
+            Simpan Produk
           </Button>
         </div>
       </header>
@@ -147,6 +138,34 @@ const EditProduct = () => {
               required
             />
           </div>
+          <div className="flex flex-col">
+            <label
+              htmlFor="type"
+              className="text-sm font-medium text-gray-700 mb-2"
+            >
+              Kategori
+            </label>
+            <div class="w-full">
+              <div class="relative">
+                <select
+                  class="w-full bg-transparent text-sm border border-gray-300 rounded-lg px-4 py-2 transition-all duration-300 ease appearance-none cursor-pointer h-[42px]"
+                  name="type"
+                  id="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                >
+                  <option value="kopi">Kopi</option>
+                  <option value="es_kopi">Es Kopi</option>
+                  <option value="jus">Jus</option>
+                </select>
+                <img
+                  src="/select.svg"
+                  alt="select"
+                  className="h-5 w-5 ml-1 absolute top-2.5 right-2.5 "
+                />
+              </div>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex flex-col">
               <label
@@ -178,19 +197,19 @@ const EditProduct = () => {
             </div>
             <div className="flex flex-col">
               <label
-                htmlFor="price"
+                htmlFor="category"
                 className="text-sm font-medium text-gray-700 mb-2"
               >
                 Harga (Rp)
               </label>
               <input
                 type="number"
-                id="price"
-                name="price"
-                value={formData.price}
+                id="category"
+                name="category"
+                value={formData.category}
                 onChange={handleChange}
                 className="border border-gray-300 rounded-lg px-4 py-2"
-                placeholder="Masukkan harga produk"
+                placeholder="Pilih kategori produk"
                 min="0"
                 required
               />
@@ -221,4 +240,4 @@ const EditProduct = () => {
   );
 };
 
-export default EditProduct;
+export default AddProduct;

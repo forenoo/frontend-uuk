@@ -1,26 +1,37 @@
-import React from "react";
-import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
-import { navItems } from "../../lib/nav-items";
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  Link,
+  Outlet,
+} from "react-router-dom";
+import { useAuth } from "../../hooks/use-auth";
+import { userNavItems } from "../../lib/nav-items";
 import { LogOutIcon } from "lucide-react";
 
-const RootLayout = () => {
+const UserLayout = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { role, username, token } = useAuth();
 
-  const data = JSON.parse(localStorage.getItem("data"));
-  if (!data || !data.username || !data.token || !data.role) {
+  if (!username || !token || !role) {
     return <Navigate to="/login" />;
+  }
+
+  if (role !== "user" && pathname === "/") {
+    return <Navigate to="/dashboard" />;
   }
 
   return (
     <div className="flex min-h-dvh bg-gray-50">
-      <aside className="w-72 h-dvh hidden lg:flex border-r border-gray-200 flex-col bg-white">
+      <aside className="w-64 h-dvh fixed top-0 left-0 hidden lg:flex border-r border-gray-200 flex-col bg-white">
         <header className="flex gap-2 items-center pl-4 h-[4rem] border-b border-gray-200">
           <img src="/logo.svg" alt="logo" className="size-8" />
           <h1 className="text-2xl text-primary-950 font-semibold">Kiro</h1>
         </header>
         <nav className="flex p-4">
           <ul className="flex flex-col w-full">
-            {navItems.map((item) => {
+            {userNavItems.map((item) => {
               const isActive = pathname.includes(item.path);
               return (
                 <li key={item.path} className="w-full">
@@ -40,29 +51,25 @@ const RootLayout = () => {
             })}
           </ul>
         </nav>
-        <footer className="mt-auto p-4">
-          <button className="flex gap-2 p-3 hover:bg-gray-400/10 transition-all duration-300 rounded-lg cursor-pointer w-full text-sm items-center text-gray-400">
+        <footer className="mt-auto border-t border-gray-200 p-4">
+          <button
+            onClick={() => {
+              localStorage.removeItem("data");
+              navigate("/login");
+            }}
+            className="flex gap-2 p-3 hover:bg-gray-400/10 transition-all duration-300 rounded-lg cursor-pointer w-full text-sm items-center text-gray-400"
+          >
             <LogOutIcon className="size-4" />
             Logout
           </button>
         </footer>
       </aside>
-      <div className="w-full">
-        <header className="flex bg-white gap-3 items-center pl-4 h-[4rem] border-b border-gray-200">
-          <h1 className="text-xl text-primary-500 font-semibold">
-            {pathname.includes("/dashboard")
-              ? "Dashboard"
-              : pathname.includes("/products")
-              ? "Produk"
-              : "Transaksi"}
-          </h1>
-        </header>
-        <main className="p-5">
-          <Outlet />
-        </main>
-      </div>
+      <main className="ml-64 mt-16 p-5 w-full">
+        <Outlet />
+      </main>
+      <aside className="w-64 h-dvh fixed top-0 right-0 hidden lg:flex border-l border-gray-200 flex-col bg-white"></aside>
     </div>
   );
 };
 
-export default RootLayout;
+export default UserLayout;

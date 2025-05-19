@@ -12,7 +12,7 @@ const Register = () => {
     e.preventDefault();
     localStorage.setItem("token", "test-dummy-token");
     localStorage.setItem("username", "test-dummy-username");
-    navigate("/");
+    navigate("/dashboard");
   };
 
   return (
@@ -22,7 +22,7 @@ const Register = () => {
           <img src="/logo.svg" alt="logo" className="size-8" />
           <h1 className="text-2xl text-primary-950 font-semibold">Kiro</h1>
         </header>
-        <div className="flex flex-col gap-[80px] w-full mt-[50px]">
+        <div className="flex flex-col gap-[40px] w-full mt-[50px]">
           <div className="space-y-1">
             <h1 className="text-4xl font-semibold text-primary-950">
               Buat Akun Anda

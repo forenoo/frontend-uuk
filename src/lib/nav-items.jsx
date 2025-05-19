@@ -1,13 +1,23 @@
-import { HomeIcon, PackageIcon, ShoppingCartIcon } from "lucide-react";
+import {
+  HomeIcon,
+  Package,
+  ShoppingBasket,
+  ShoppingCartIcon,
+} from "lucide-react";
 
 export const navItems = [
   {
     icon: <HomeIcon className="size-4" />,
-    label: "Dashboard",
+    label: "Beranda",
     path: "/dashboard",
   },
   {
-    icon: <PackageIcon className="size-4" />,
+    icon: <Package className="size-4" />,
+    label: "Kategori",
+    path: "/categories",
+  },
+  {
+    icon: <ShoppingBasket className="size-4" />,
     label: "Produk",
     path: "/products",
   },
@@ -15,5 +25,18 @@ export const navItems = [
     icon: <ShoppingCartIcon className="size-4" />,
     label: "Transaksi",
     path: "/transactions",
+  },
+];
+
+export const userNavItems = [
+  {
+    icon: <HomeIcon className="size-4" />,
+    label: "Beranda",
+    path: "/",
+  },
+  {
+    icon: <ShoppingCartIcon className="size-4" />,
+    label: "Riwayat",
+    path: "/history",
   },
 ];

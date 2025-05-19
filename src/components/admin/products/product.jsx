@@ -2,46 +2,18 @@ import {
   Cookie,
   CupSoda,
   Ellipsis,
-  EllipsisVertical,
-  Eye,
   Hamburger,
   Pencil,
   Plus,
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import Button from "../ui/Button";
+import Button from "../../ui/Button";
 import { useNavigate } from "react-router-dom";
+import { productMockData } from "../../../lib/mockdata";
 
 const Product = () => {
   const navigate = useNavigate();
-
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: "Product 1",
-      price: 100000,
-      stock: 10,
-      type: "minuman",
-      image: "https://placehold.co/100x100",
-    },
-    {
-      id: 2,
-      name: "Product 2",
-      price: 200000,
-      stock: 5,
-      type: "makanan",
-      image: "https://placehold.co/100x100",
-    },
-    {
-      id: 3,
-      name: "Product 3",
-      price: 150000,
-      stock: 15,
-      type: "snack",
-      image: "https://placehold.co/100x100",
-    },
-  ]);
 
   const [activeDropdown, setActiveDropdown] = useState(null);
 
@@ -53,13 +25,20 @@ const Product = () => {
     <div className="flex flex-col gap-5">
       <header className="flex justify-between items-center bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-5">
         <h1 className="text-2xl font-medium text-primary-950">Daftar Produk</h1>
-        <Button
-          onClick={() => navigate("/products/add")}
-          className="!w-fit flex items-center gap-2"
-        >
-          <Plus className="size-4" />
-          Tambah Produk
-        </Button>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Cari produk"
+            className="max-w-[200px] border text-sm border-gray-300 rounded-lg px-4 py-2"
+          />
+          <Button
+            onClick={() => navigate("/products/add")}
+            className="!w-fit flex items-center gap-2"
+          >
+            <Plus className="size-4" />
+            Tambah Produk
+          </Button>
+        </div>
       </header>
       <div className="bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-5 flex flex-col">
         <div className="overflow-x-auto">
@@ -70,6 +49,9 @@ const Product = () => {
                   Produk
                 </th>
                 <th className="p-3 text-sm font-medium text-gray-500">Tipe</th>
+                <th className="p-3 text-sm font-medium text-gray-500">
+                  Kategori
+                </th>
                 <th className="p-3 text-sm font-medium text-gray-500">Harga</th>
                 <th className="p-3 text-sm font-medium text-gray-500">Stok</th>
                 <th className="p-3 text-sm font-medium text-gray-500 rounded-tr-lg text-center">
@@ -78,7 +60,7 @@ const Product = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {products.map((product) => (
+              {productMockData.map((product) => (
                 <tr
                   key={product.id}
                   className="hover:bg-gray-50 text-primary-950"
@@ -111,6 +93,7 @@ const Product = () => {
                       </span>
                     )}
                   </td>
+                  <td className="p-3 text-sm">{product.category}</td>
                   <td className="p-3 text-sm">
                     Rp {product.price.toLocaleString("id-ID")}
                   </td>
@@ -149,7 +132,7 @@ const Product = () => {
                   </td>
                 </tr>
               ))}
-              {products.length === 0 && (
+              {productMockData.length === 0 && (
                 <tr>
                   <td
                     colSpan="4"
