@@ -1,7 +1,7 @@
 import { ArrowLeft, Upload } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Button from "../../ui/Button";
+import Button from "../../ui/button";
 import EmojiPicker from "emoji-picker-react";
 
 const AddCategory = () => {
@@ -10,7 +10,6 @@ const AddCategory = () => {
     icon: "",
     status: "aktif",
   });
-
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const handleChange = (e) => {

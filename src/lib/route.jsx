@@ -2,7 +2,6 @@ import { createBrowserRouter } from "react-router-dom";
 import Login from "../components/login";
 import Register from "../components/register";
 import Dashboard from "../components/admin/dashboard/dashboard";
-import AuthGuard from "../components/guard/auth-guard";
 import Product from "../components/admin/products/product";
 import AddProduct from "../components/admin/products/add-product";
 import EditProduct from "../components/admin/products/edit-product";
@@ -13,10 +12,13 @@ import EditCategory from "../components/admin/categories/edit-category";
 import TransactionDetail from "../components/admin/transactions/transaction-detail";
 import AdminLayout from "../components/layout/admin-layout";
 import UserLayout from "../components/layout/user-layout";
+import AuthLayout from "../components/layout/auth-layout";
+import Home from "../components/user/home";
+import HistoryTransaction from "../components/user/history-transaction";
 
 export const routes = createBrowserRouter([
   {
-    element: <AuthGuard />,
+    element: <AuthLayout />,
     children: [
       {
         path: "/login",
@@ -70,7 +72,16 @@ export const routes = createBrowserRouter([
     ],
   },
   {
-    path: "/",
     element: <UserLayout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/history",
+        element: <HistoryTransaction />,
+      },
+    ],
   },
 ]);

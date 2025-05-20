@@ -8,7 +8,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import Button from "../../ui/Button";
+import Button from "../../ui/button";
 import { useNavigate } from "react-router-dom";
 import { categoryMockData } from "../../../lib/mockdata";
 

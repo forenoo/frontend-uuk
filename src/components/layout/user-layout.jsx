@@ -32,7 +32,7 @@ const UserLayout = () => {
         <nav className="flex p-4">
           <ul className="flex flex-col w-full">
             {userNavItems.map((item) => {
-              const isActive = pathname.includes(item.path);
+              const isActive = pathname === item.path;
               return (
                 <li key={item.path} className="w-full">
                   <Link
@@ -64,10 +64,9 @@ const UserLayout = () => {
           </button>
         </footer>
       </aside>
-      <main className="ml-64 mt-16 p-5 w-full">
+      <main className="lg:ml-64 p-5 w-full">
         <Outlet />
       </main>
-      <aside className="w-64 h-dvh fixed top-0 right-0 hidden lg:flex border-l border-gray-200 flex-col bg-white"></aside>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import loginIllus from "../assets/login-illustration.png";
 import { Link, useNavigate } from "react-router-dom";
 import AuthField from "./ui/auth-field";
-import Button from "./ui/Button";
+import Button from "./ui/button";
 
 const Login = () => {
   document.title = "Login | Kiro";

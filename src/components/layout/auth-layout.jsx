@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
-const AuthGuard = () => {
+const AuthLayout = () => {
   const data = JSON.parse(localStorage.getItem("data"));
   if (data && data.username && data.token && data.role) {
     return <Navigate to="/" />;
@@ -10,4 +10,4 @@ const AuthGuard = () => {
   return <Outlet />;
 };
 
-export default AuthGuard;
+export default AuthLayout;
