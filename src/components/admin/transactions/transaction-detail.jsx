@@ -155,7 +155,7 @@ const TransactionDetail = () => {
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center">
               <p className="text-sm text-gray-500">ID Pesanan</p>
-              <p className="font-medium">#{transaction._id}</p>
+              <p className="font-medium">{transaction._id}</p>
             </div>
             <div className="flex justify-between items-center">
               <p className="text-sm text-gray-500">Tanggal</p>
