@@ -1,19 +1,36 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../ui/button";
-import { productMockData, categoryMockData } from "../../lib/mockdata";
 import { ShoppingBagIcon } from "lucide-react";
+import { client } from "../../lib/axios-instance";
 
 const Home = () => {
-  const [products] = useState(productMockData);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [activeCategory, setActiveCategory] = useState({
+    _id: "all",
+    name: "All",
+    icon: "",
+  });
   const [cart, setCart] = useState([]);
 
-  const [activeCategory, setActiveCategory] = useState("All");
+  const handleFetchCategories = async () => {
+    await client.get("/categories").then((res) => {
+      setCategories(res.data.data);
+    });
+  };
+
   const allCategories = [
-    "All",
-    ...categoryMockData
-      .filter((cat) => cat.status === "aktif")
-      .map((cat) => cat.name),
+    {
+      _id: "all",
+      name: "All",
+      icon: "",
+    },
+    ...categories,
   ];
+
+  useEffect(() => {
+    handleFetchCategories();
+  }, []);
 
   const addToCart = (product) => {
     const existingItem = cart.find((item) => item.id === product.id);
@@ -30,11 +47,6 @@ const Home = () => {
       setCart([...cart, { ...product, quantity: 1 }]);
     }
   };
-
-  const filteredProducts =
-    activeCategory === "All"
-      ? products
-      : products.filter((product) => product.category === activeCategory);
 
   const cartTotal = cart.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -55,26 +67,21 @@ const Home = () => {
         <div className="flex space-x-2 mb-5 overflow-x-auto">
           {allCategories.map((category) => (
             <button
-              key={category}
+              key={category._id}
               onClick={() => setActiveCategory(category)}
               className={`px-4 py-2 text-sm hover:cursor-pointer rounded-full whitespace-nowrap ${
-                activeCategory === category
+                activeCategory._id === category._id
                   ? "bg-primary-500 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              {category === "All"
-                ? "All"
-                : `${
-                    categoryMockData.find((cat) => cat.name === category)
-                      ?.icon || ""
-                  } ${category}`}
+              {category.icon} {category.name}
             </button>
           ))}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {filteredProducts.map((product) => (
+          {products.map((product) => (
             <div
               key={product.id}
               className="bg-white rounded-lg overflow-hidden border border-gray-200"

@@ -1,25 +1,36 @@
-import { ArrowLeft, Cookie, CupSoda, Hamburger } from "lucide-react";
+import {
+  ArrowLeft,
+  Cookie,
+  CupSoda,
+  Hamburger,
+  Upload,
+  Loader2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import Button from "../../ui/Button";
-import { productMockData } from "../../../lib/mockdata";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import Button from "../../ui/button";
+import axios from "axios";
+
+const BASE_URL = "http://localhost:8000/api";
 
 const EditProduct = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
-    id: id,
-    name: "Product 1",
-    price: 100000,
-    stock: 10,
-    type: "minuman",
-    image: "https://placehold.co/100x100",
-    category: "es_kopi",
+    name: "",
+    price: "",
+    stock: "",
+    type: "",
+    category_id: "",
+    image_url: "",
   });
 
-  const [imagePreview, setImagePreview] = useState(
-    "https://placehold.co/100x100"
-  );
+  const [imagePreview, setImagePreview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
+  const [error, setError] = useState(null);
+  const [newImage, setNewImage] = useState(null);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -31,10 +42,7 @@ const EditProduct = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData((prev) => ({
-        ...prev,
-        image: file,
-      }));
+      setNewImage(file);
 
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -44,21 +52,95 @@ const EditProduct = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/categories`);
+      setCategories(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setError("Failed to load categories");
+    }
+  };
+
+  const fetchProduct = async () => {
+    try {
+      setIsFetching(true);
+      const response = await axios.get(`${BASE_URL}/products/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+      });
+
+      const product = response.data.data;
+      if (product) {
+        setFormData({
+          name: product.name,
+          price: product.price,
+          stock: product.stock,
+          type: product.type,
+          category_id: product.category ? product.category._id : "",
+          image_url: product.image_url,
+        });
+
+        // Set image preview with the full URL
+        setImagePreview(`http://localhost:8000${product.image_url}`);
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      setError("Failed to load product data");
+    } finally {
+      setIsFetching(false);
+    }
   };
 
   useEffect(() => {
-    const product = productMockData.find(
-      (product) => product.id === parseInt(id)
-    );
+    fetchCategories();
+    fetchProduct();
+  }, [id]);
 
-    if (product) {
-      setFormData(product);
-      setImagePreview(product.image);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("price", formData.price);
+      formDataToSend.append("stock", formData.stock);
+      formDataToSend.append("type", formData.type);
+      formDataToSend.append("category_id", formData.category_id);
+
+      // Only add image if a new one was selected
+      if (newImage) {
+        formDataToSend.append("image", newImage);
+      }
+
+      await axios.put(`${BASE_URL}/products/${id}`, formDataToSend, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      navigate("/products");
+    } catch (err) {
+      console.error("Error updating product:", err);
+      setError(err.response?.data?.message || "Failed to update product");
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  };
+
+  if (isFetching) {
+    return (
+      <div className="flex flex-col gap-5">
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="size-10 animate-spin text-primary-500" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -81,15 +163,29 @@ const EditProduct = () => {
           </Link>
           <Button
             type="submit"
-            className="flex items-center gap-2"
+            onClick={handleSubmit}
             disabled={isLoading}
+            className="flex items-center gap-2"
           >
-            {isLoading ? "Menyimpan..." : "Simpan Produk"}
+            {isLoading ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Menyimpan...
+              </>
+            ) : (
+              "Simpan Perubahan"
+            )}
           </Button>
         </div>
       </header>
 
       <div className="bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-6 flex flex-col">
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-2">
@@ -111,6 +207,9 @@ const EditProduct = () => {
                       src={imagePreview}
                       alt="Product Preview"
                       className="w-full h-full object-contain rounded-lg"
+                      onError={(e) => {
+                        e.target.src = "https://placehold.co/100x100";
+                      }}
                     />
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
                       <p className="text-white text-base">
@@ -160,23 +259,26 @@ const EditProduct = () => {
           </div>
           <div className="flex flex-col">
             <label
-              htmlFor="type"
+              htmlFor="category_id"
               className="text-sm font-medium text-gray-700 mb-2"
             >
               Kategori
             </label>
-            <div class="w-full">
-              <div class="relative">
+            <div className="w-full">
+              <div className="relative">
                 <select
-                  class="w-full bg-transparent text-sm border border-gray-300 rounded-lg px-4 py-2 transition-all duration-300 ease appearance-none cursor-pointer h-[42px]"
-                  name="type"
-                  id="type"
-                  value={formData.type}
+                  className="w-full bg-transparent text-sm border border-gray-300 rounded-lg px-4 py-2 transition-all duration-300 ease appearance-none cursor-pointer h-[42px]"
+                  name="category_id"
+                  id="category_id"
+                  value={formData.category_id}
                   onChange={handleChange}
                 >
-                  <option value="kopi">Kopi</option>
-                  <option value="es_kopi">Es Kopi</option>
-                  <option value="jus">Jus</option>
+                  <option value="">Pilih Kategori</option>
+                  {categories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.icon} {category.name}
+                    </option>
+                  ))}
                 </select>
                 <img
                   src="/select.svg"
@@ -194,17 +296,17 @@ const EditProduct = () => {
               >
                 Tipe Produk
               </label>
-              <div class="w-full">
-                <div class="relative">
+              <div className="w-full">
+                <div className="relative">
                   <select
-                    class="w-full bg-transparent text-sm border border-gray-300 rounded-lg px-4 py-2 transition-all duration-300 ease appearance-none cursor-pointer h-[42px]"
+                    className="w-full bg-transparent text-sm border border-gray-300 rounded-lg px-4 py-2 transition-all duration-300 ease appearance-none cursor-pointer h-[42px]"
                     name="type"
                     id="type"
                     value={formData.type}
                     onChange={handleChange}
                   >
-                    <option value="minuman">Minuman</option>
-                    <option value="makanan">Makanan</option>
+                    <option value="drink">Minuman</option>
+                    <option value="food">Makanan</option>
                     <option value="snack">Snack</option>
                   </select>
                   <img

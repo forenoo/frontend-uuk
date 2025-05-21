@@ -2,23 +2,53 @@ import loginIllus from "../assets/login-illustration.png";
 import { Link, useNavigate } from "react-router-dom";
 import AuthField from "./ui/auth-field";
 import Button from "./ui/button";
+import { client } from "../lib/axios-instance";
+import { useState } from "react";
 
 const Login = () => {
   document.title = "Login | Kiro";
 
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState({
+    username: "",
+    password: "",
+  });
+
+  const handleOnChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
 
-    const data = {
-      token: "test-dummy-token",
-      username: "test-dummy-username",
-      role: "user",
-    };
+    await client
+      .post("/auth/login", formData)
+      .then((res) => {
+        const dataToSave = {
+          token: res.data.data.token,
+          username: res.data.data.user.username,
+          role: res.data.data.user.role,
+        };
 
-    localStorage.setItem("data", JSON.stringify(data));
-    navigate("/");
+        localStorage.setItem("data", JSON.stringify(dataToSave));
+        navigate("/");
+      })
+      .catch((e) => {
+        if (e.response && e.response.data && e.response.data.errors) {
+          const validationErrors = {};
+          e.response.data.errors.forEach((error) => {
+            validationErrors[error.path] = error.msg;
+          });
+          setErrors(validationErrors);
+        } else {
+          console.log(e);
+        }
+      });
   };
 
   return (
@@ -42,13 +72,17 @@ const Login = () => {
               label="Username"
               type="text"
               name="username"
+              onChange={handleOnChange}
               placeholder="Masukkan username anda"
+              error={errors.username}
             />
             <AuthField
               label="Kata Sandi"
               type="password"
               name="password"
+              onChange={handleOnChange}
               placeholder="Masukkan kata sandi anda"
+              error={errors.password}
             />
             <Button className="w-full bg-primary-500 text-white rounded-lg p-2">
               Masuk

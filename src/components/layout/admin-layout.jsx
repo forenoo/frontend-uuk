@@ -87,7 +87,7 @@ const AdminLayout = () => {
               : "Transaksi"}
           </h1>
         </header>
-        <main className="ml-64 mt-16 p-5 ">
+        <main className="lg:ml-64 mt-16 p-5 ">
           <Outlet />
         </main>
       </div>

@@ -1,20 +1,40 @@
 import { ArrowLeft, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import Button from "../../ui/Button";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import Button from "../../ui/button";
 import EmojiPicker from "emoji-picker-react";
-import { categoryMockData } from "../../../lib/mockdata";
+import { client } from "../../../lib/axios-instance";
 
 const EditCategory = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
     icon: "",
     status: "",
   });
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  const fetchCategoryDetails = async () => {
+    try {
+      setLoading(true);
+      await client
+        .get(`/categories/${id}`)
+        .then((res) => {
+          setFormData(res.data.data);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } catch (error) {
+      setError("Failed to load category details");
+      setLoading(false);
+      console.error("Error fetching category:", error);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -31,16 +51,37 @@ const EditCategory = () => {
     setShowEmojiPicker(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      await client.put(`/categories/${id}`, formData);
+      navigate("/categories");
+    } catch (error) {
+      console.error("Error updating category:", error);
+      setError("Failed to update category");
+    }
   };
 
   useEffect(() => {
-    const category = categoryMockData.find(
-      (category) => category.id === parseInt(id)
+    fetchCategoryDetails();
+  }, [id]);
+
+  if (loading) {
+    return <div className="p-5">Loading category details...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="p-5 text-red-500">
+        {error}
+        <div className="mt-2">
+          <Link to="/categories" className="text-primary-500 hover:underline">
+            Back to categories
+          </Link>
+        </div>
+      </div>
     );
-    setFormData(category);
-  }, []);
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -134,8 +175,8 @@ const EditCategory = () => {
                   value={formData.status}
                   onChange={handleChange}
                 >
-                  <option value="aktif">Aktif</option>
-                  <option value="tidak_aktif">Tidak Aktif</option>
+                  <option value="active">Aktif</option>
+                  <option value="inactive">Tidak Aktif</option>
                 </select>
                 <img
                   src="/select.svg"

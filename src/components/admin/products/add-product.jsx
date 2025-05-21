@@ -1,19 +1,38 @@
-import { ArrowLeft, Cookie, CupSoda, Hamburger, Upload } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import Button from "../../ui/Button";
+import { ArrowLeft, Upload, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Button from "../../ui/button";
+import { client } from "../../../lib/axios-instance";
 
 const AddProduct = () => {
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     stock: "",
-    type: "makanan",
-    category: "",
+    type: "food",
+    category_id: "",
     image: null,
   });
 
   const [imagePreview, setImagePreview] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      await client.get("/categories").then((res) => {
+        setCategories(res.data.data);
+      });
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -38,8 +57,41 @@ const AddProduct = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Create a FormData object for file upload
+      const productFormData = new FormData();
+
+      // Add text fields to FormData
+      productFormData.append("name", formData.name);
+      productFormData.append("price", formData.price);
+      productFormData.append("stock", formData.stock);
+      productFormData.append("type", formData.type);
+      productFormData.append("category_id", formData.category_id);
+
+      if (formData.image) {
+        productFormData.append("image", formData.image);
+      }
+
+      await client
+        .post("/products", productFormData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then(() => {
+          navigate("/products");
+        });
+    } catch (err) {
+      console.error("Error creating product:", err);
+      setError(err.response?.data?.message || "Failed to create product");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,13 +115,31 @@ const AddProduct = () => {
           >
             Batal
           </Link>
-          <Button type="submit" className="flex items-center gap-2">
-            Simpan Produk
+          <Button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Menyimpan...
+              </>
+            ) : (
+              "Simpan Produk"
+            )}
           </Button>
         </div>
       </header>
 
       <div className="bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-6 flex flex-col">
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-2">
@@ -140,23 +210,27 @@ const AddProduct = () => {
           </div>
           <div className="flex flex-col">
             <label
-              htmlFor="type"
+              htmlFor="category_id"
               className="text-sm font-medium text-gray-700 mb-2"
             >
               Kategori
             </label>
-            <div class="w-full">
-              <div class="relative">
+            <div className="w-full">
+              <div className="relative">
                 <select
-                  class="w-full bg-transparent text-sm border border-gray-300 rounded-lg px-4 py-2 transition-all duration-300 ease appearance-none cursor-pointer h-[42px]"
-                  name="type"
-                  id="type"
-                  value={formData.type}
+                  className="w-full bg-transparent text-sm border border-gray-300 rounded-lg px-4 py-2 transition-all duration-300 ease appearance-none cursor-pointer h-[42px]"
+                  name="category_id"
+                  id="category_id"
+                  value={formData.category_id}
                   onChange={handleChange}
+                  required
                 >
-                  <option value="kopi">Kopi</option>
-                  <option value="es_kopi">Es Kopi</option>
-                  <option value="jus">Jus</option>
+                  <option value="">Pilih Kategori</option>
+                  {categories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.icon} {category.name}
+                    </option>
+                  ))}
                 </select>
                 <img
                   src="/select.svg"
@@ -174,17 +248,17 @@ const AddProduct = () => {
               >
                 Tipe Produk
               </label>
-              <div class="w-full">
-                <div class="relative">
+              <div className="w-full">
+                <div className="relative">
                   <select
-                    class="w-full bg-transparent text-sm border border-gray-300 rounded-lg px-4 py-2 transition-all duration-300 ease appearance-none cursor-pointer h-[42px]"
+                    className="w-full bg-transparent text-sm border border-gray-300 rounded-lg px-4 py-2 transition-all duration-300 ease appearance-none cursor-pointer h-[42px]"
                     name="type"
                     id="type"
                     value={formData.type}
                     onChange={handleChange}
                   >
-                    <option value="minuman">Minuman</option>
-                    <option value="makanan">Makanan</option>
+                    <option value="drink">Minuman</option>
+                    <option value="food">Makanan</option>
                     <option value="snack">Snack</option>
                   </select>
                   <img
@@ -197,19 +271,19 @@ const AddProduct = () => {
             </div>
             <div className="flex flex-col">
               <label
-                htmlFor="category"
+                htmlFor="price"
                 className="text-sm font-medium text-gray-700 mb-2"
               >
                 Harga (Rp)
               </label>
               <input
                 type="number"
-                id="category"
-                name="category"
-                value={formData.category}
+                id="price"
+                name="price"
+                value={formData.price}
                 onChange={handleChange}
                 className="border border-gray-300 rounded-lg px-4 py-2"
-                placeholder="Pilih kategori produk"
+                placeholder="Masukkan harga produk"
                 min="0"
                 required
               />

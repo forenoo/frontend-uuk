@@ -1,18 +1,43 @@
 import loginIllus from "../assets/login-illustration.png";
 import { Link, useNavigate } from "react-router-dom";
 import AuthField from "./ui/auth-field";
-import Button from "./ui/Button";
+import Button from "./ui/button";
+import { useState } from "react";
+import { client } from "../lib/axios-instance";
 
 const Register = () => {
   document.title = "Register | Kiro";
 
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: "",
+    address: "",
+    phone: "",
+    password: "",
+  });
+
+  const handleOnChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem("token", "test-dummy-token");
-    localStorage.setItem("username", "test-dummy-username");
-    navigate("/dashboard");
+
+    await client
+      .post("/auth/register", formData)
+      .then((res) => {
+        const dataToSave = {
+          token: res.data.data.token,
+          username: res.data.data.user.username,
+          role: res.data.data.user.role,
+        };
+
+        localStorage.setItem("data", JSON.stringify(dataToSave));
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -37,24 +62,28 @@ const Register = () => {
               type="text"
               name="username"
               placeholder="Masukkan username anda"
+              onChange={handleOnChange}
             />
             <AuthField
               label="Alamat"
               textArea
               name="address"
               placeholder="Masukkan alamat anda"
+              onChange={handleOnChange}
             />
             <AuthField
               label="Nomor Telepon"
               type="number"
               name="phone"
               placeholder="Masukkan nomor telepon anda"
+              onChange={handleOnChange}
             />
             <AuthField
               label="Kata Sandi"
               type="password"
               name="password"
               placeholder="Masukkan kata sandi anda"
+              onChange={handleOnChange}
             />
             <Button className="w-full bg-primary-500 text-white rounded-lg p-2">
               Daftar
