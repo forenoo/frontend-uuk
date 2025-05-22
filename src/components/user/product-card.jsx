@@ -40,8 +40,8 @@ const ProductCard = ({ product, cart, setCart, formatPrice }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
-      <div className="h-40 overflow-hidden relative">
+    <div className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm transition-all hover:shadow-md">
+      <div className="h-32 sm:h-40 overflow-hidden relative">
         <img
           src={`http://localhost:8000${product.image_url}`}
           alt={product.name}
@@ -55,28 +55,32 @@ const ProductCard = ({ product, cart, setCart, formatPrice }) => {
           {product.stock} tersisa
         </div>
       </div>
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <div>
-          <p className="text-xs text-gray-600">{product.category?.name}</p>
-          <h3 className="font-medium text-gray-800">{product.name}</h3>
-          <p className="font-medium text-primary-500">
+          <p className="text-xs text-gray-600 truncate">
+            {product.category?.name}
+          </p>
+          <h3 className="font-medium text-gray-800 text-sm sm:text-base truncate">
+            {product.name}
+          </h3>
+          <p className="font-medium text-primary-500 text-sm sm:text-base">
             {formatPrice(product.price)}
           </p>
         </div>
 
         <div
-          className={`flex items-center p-1 rounded-xl justify-between mt-3 ${
+          className={`flex items-center p-1 rounded-xl justify-between mt-2 sm:mt-3 ${
             product.stock === 0 ? "bg-red-500/20" : "bg-primary-500/20"
           }`}
         >
           <button
             onClick={handleMinus}
             disabled={quantity === 0}
-            className={`!w-8 !h-8 flex items-center justify-center rounded-lg enabled:hover:bg-primary-600 transition-colors duration-300 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`w-7 h-7 sm:!w-8 sm:!h-8 flex items-center justify-center rounded-lg enabled:hover:bg-primary-600 transition-colors duration-300 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
               product.stock === 0 ? "bg-red-500" : "bg-primary-500"
             }`}
           >
-            <MinusIcon className="text-white" />
+            <MinusIcon className="text-white w-4 h-4 sm:w-5 sm:h-5" />
           </button>
           <span
             className={`text-center font-semibold ${
@@ -88,11 +92,11 @@ const ProductCard = ({ product, cart, setCart, formatPrice }) => {
           <button
             onClick={handleAdd}
             disabled={quantity >= product.stock}
-            className={`!w-8 !h-8 flex items-center justify-center rounded-lg enabled:hover:bg-primary-600 transition-colors duration-300 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`w-7 h-7 sm:!w-8 sm:!h-8 flex items-center justify-center rounded-lg enabled:hover:bg-primary-600 transition-colors duration-300 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
               product.stock === 0 ? "bg-red-500" : "bg-primary-500"
             }`}
           >
-            <PlusIcon className="text-white" />
+            <PlusIcon className="text-white w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       </div>

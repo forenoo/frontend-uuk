@@ -1,10 +1,12 @@
 import { Ellipsis, Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import Button from "../../ui/button";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { client } from "../../../lib/axios-instance";
+import Button from "../../ui/button";
 
 const Category = () => {
+  document.title = "Daftar Kategori | Admin";
+
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -64,7 +66,6 @@ const Category = () => {
     fetchCategories();
   }, [location.search]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = () => {
       setActiveDropdown(null);
@@ -94,6 +95,9 @@ const Category = () => {
               onChange={handleSearchChange}
               className="w-full sm:max-w-[200px] border text-sm border-gray-300 rounded-lg px-4 py-2"
             />
+            <Button type="submit" className={"!w-fit"}>
+              Cari
+            </Button>
           </form>
           <Button
             onClick={() => navigate("/categories/add")}

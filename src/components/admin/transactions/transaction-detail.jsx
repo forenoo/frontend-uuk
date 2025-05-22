@@ -237,27 +237,25 @@ const TransactionDetail = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      <header className="flex justify-between items-center bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-4">
-            <Link
-              to="/transactions"
-              className="p-2 rounded-md border border-gray-200 hover:bg-gray-100"
-            >
-              <ArrowLeft className="size-5 text-gray-500" />
-            </Link>
-            <h1 className="text-2xl font-medium text-primary-950">
-              Detail Transaksi
-            </h1>
-          </div>
+      <header className="flex flex-col sm:flex-row justify-between items-center bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5 gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <Link
+            to="/transactions"
+            className="p-2 rounded-md border border-gray-200 hover:bg-gray-100"
+          >
+            <ArrowLeft className="size-5 text-gray-500" />
+          </Link>
+          <h1 className="text-xl sm:text-2xl font-medium text-primary-950">
+            Detail Transaksi
+          </h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center w-full sm:w-auto">
           <Button
-            className="!w-fit flex items-center gap-2"
+            className="!w-full sm:!w-fit flex items-center justify-center gap-2"
             onClick={generatePDF}
           >
             <Printer className="size-4" />
-            Cetak Struk
+            Buat Struk
           </Button>
         </div>
       </header>
@@ -270,15 +268,21 @@ const TransactionDetail = () => {
           <div className="grid gap-4">
             <div>
               <p className="text-sm text-gray-500">Username</p>
-              <p className="font-medium">{transaction.customer.username}</p>
+              <p className="font-medium break-words">
+                {transaction.customer.username}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Nomor Telepon</p>
-              <p className="font-medium">{transaction.customer.phone_number}</p>
+              <p className="font-medium break-words">
+                {transaction.customer.phone_number}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Alamat</p>
-              <p className="font-medium">{transaction.customer.address}</p>
+              <p className="font-medium break-words">
+                {transaction.customer.address}
+              </p>
             </div>
           </div>
         </div>
@@ -288,23 +292,23 @@ const TransactionDetail = () => {
             Ringkasan Transaksi
           </h2>
           <div className="flex flex-col gap-2">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center">
               <p className="text-sm text-gray-500">ID Pesanan</p>
-              <p className="font-medium">{transaction._id}</p>
+              <p className="font-medium break-all">{transaction._id}</p>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center">
               <p className="text-sm text-gray-500">Tanggal</p>
               <p className="font-medium">{formatDate(transaction.createdAt)}</p>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center">
               <p className="text-sm text-gray-500">Waktu</p>
               <p className="font-medium">{formatTime(transaction.createdAt)}</p>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center">
               <p className="text-sm text-gray-500">Total Produk</p>
               <p className="font-medium">{transaction.total_items} Item</p>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center">
               <p className="text-sm text-gray-500">Total</p>
               <p className="font-medium text-primary-500">
                 Rp {transaction.total_price.toLocaleString("id-ID")}
@@ -319,7 +323,7 @@ const TransactionDetail = () => {
           Detail Pesanan
         </h2>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[600px]">
             <thead className="bg-gray-50 text-left">
               <tr>
                 <th className="p-3 text-sm font-medium text-gray-500 rounded-tl-lg">

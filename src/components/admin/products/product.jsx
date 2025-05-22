@@ -7,6 +7,7 @@ import {
   Plus,
   Trash2,
   Loader2,
+  Search,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Button from "../../ui/button";
@@ -14,9 +15,9 @@ import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { client } from "../../../lib/axios-instance";
 
-const BASE_URL = "http://localhost:8000/api";
-
 const Product = () => {
+  document.title = "Daftar Produk | Admin";
+
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,8 +36,10 @@ const Product = () => {
     try {
       setLoading(true);
       const url = searchQuery
-        ? `${BASE_URL}/products?q=${encodeURIComponent(searchQuery)}`
-        : `${BASE_URL}/products`;
+        ? `${import.meta.env.VITE_API_URL}/products?q=${encodeURIComponent(
+            searchQuery
+          )}`
+        : `${import.meta.env.VITE_API_URL}/products`;
       const response = await client.get(url);
       setProducts(response.data.data || []);
       setError(null);
@@ -61,12 +64,12 @@ const Product = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.delete(`${BASE_URL}/products/${id}`, {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/products/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
           },
         });
-        fetchProducts(); // Refresh the list after deletion
+        fetchProducts();
         setActiveDropdown(null);
       } catch (error) {
         console.error("Error deleting product:", error);
@@ -81,21 +84,30 @@ const Product = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      <header className="flex justify-between items-center bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5">
         <h1 className="text-2xl font-medium text-primary-950">Daftar Produk</h1>
-        <div className="flex items-center gap-2">
-          <form onSubmit={handleSearch} className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Cari produk"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="max-w-[200px] border text-sm border-gray-300 rounded-lg px-4 py-2"
-            />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+          <form
+            onSubmit={handleSearch}
+            className="flex items-center gap-2 w-full sm:w-auto"
+          >
+            <div className="relative w-full sm:w-[200px]">
+              <input
+                type="text"
+                placeholder="Cari produk"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="w-full border text-sm border-gray-300 rounded-lg pl-9 pr-4 py-2"
+              />
+              <Search className="absolute left-3 top-2.5 size-4 text-gray-400" />
+            </div>
+            <Button type="submit" className={"!w-fit"}>
+              Cari
+            </Button>
           </form>
           <Button
             onClick={() => navigate("/products/add")}
-            className="!w-fit flex items-center gap-2"
+            className="!w-full sm:!w-fit flex items-center justify-center gap-2"
           >
             <Plus className="size-4" />
             Tambah Produk
@@ -111,7 +123,7 @@ const Product = () => {
           <div className="text-center text-red-500 py-5">{error}</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[800px]">
               <thead className="bg-gray-50 text-left">
                 <tr>
                   <th className="p-3 text-sm font-medium text-gray-500 rounded-tl-lg">
@@ -191,7 +203,7 @@ const Product = () => {
                     </td>
                     <td className="p-3 text-sm">{product.stock}</td>
                     <td className="p-3 text-sm text-center">
-                      <div>
+                      <div className="relative">
                         <button
                           className="inline-flex items-center justify-center cursor-pointer p-1 rounded-full hover:bg-gray-100"
                           onClick={() =>
@@ -202,7 +214,7 @@ const Product = () => {
                         </button>
 
                         {activeDropdown === (product._id || product.id) && (
-                          <div className="absolute right-8 z-10 mt-1 bg-white rounded-lg shadow-lg border border-gray-200">
+                          <div className="absolute right-0 z-10 mt-1 bg-white rounded-lg shadow-lg border border-gray-200">
                             <ul className="py-1 text-sm text-primary-950 divide-y divide-gray-200">
                               <li>
                                 <button

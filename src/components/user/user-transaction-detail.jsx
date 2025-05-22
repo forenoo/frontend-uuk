@@ -258,7 +258,7 @@ const UserTransactionDetail = () => {
             onClick={generatePDF}
           >
             <Printer className="size-4" />
-            Cetak Struk
+            Buat Struk
           </Button>
         </div>
       </header>

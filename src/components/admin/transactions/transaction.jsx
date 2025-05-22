@@ -7,6 +7,8 @@ import Button from "../../ui/button";
 import { jsPDF } from "jspdf";
 
 const Transaction = () => {
+  document.title = "Daftar Transaksi | Admin";
+
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [transactions, setTransactions] = useState([]);
@@ -211,24 +213,30 @@ const Transaction = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      <header className="flex justify-between items-center bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5">
-        <h1 className="text-2xl font-medium text-primary-950">
+      <header className="flex flex-col lg:flex-row justify-between items-center bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5 gap-4">
+        <h1 className="text-xl sm:text-2xl font-medium text-primary-950">
           Daftar Transaksi
         </h1>
-        <div className="flex items-center gap-2">
-          <form onSubmit={handleSearch} className="flex items-center">
+        <div className="flex flex-col sm:flex-row w-full lg:w-auto items-center gap-3">
+          <form
+            onSubmit={handleSearch}
+            className="flex items-center gap-2 w-full sm:w-auto"
+          >
             <input
               type="text"
               placeholder="Cari transaksi"
               value={searchQuery}
               onChange={handleSearchChange}
-              className="max-w-[200px] border text-sm border-gray-300 rounded-lg px-4 py-2"
+              className="w-full sm:max-w-[200px] border text-sm border-gray-300 rounded-lg px-4 py-2"
             />
+            <Button type="submit" className={"!w-fit"}>
+              Cari
+            </Button>
           </form>
           <Button
             type="button"
             onClick={generateTransactionsReport}
-            className="flex items-center gap-2"
+            className="flex w-full sm:w-auto items-center justify-center gap-2"
           >
             <Printer className="size-4" />
             Buat Laporan
@@ -237,7 +245,7 @@ const Transaction = () => {
       </header>
       <div className="bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5 flex flex-col">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[800px]">
             <thead className="bg-gray-50 text-left">
               <tr>
                 <th className="p-3 text-sm font-medium text-gray-500">
@@ -261,7 +269,9 @@ const Transaction = () => {
                   key={transaction._id}
                   className="hover:bg-gray-50 text-primary-950"
                 >
-                  <td className="p-3 text-sm font-medium">{transaction._id}</td>
+                  <td className="p-3 text-sm font-medium max-w-[150px] truncate">
+                    {transaction._id}
+                  </td>
                   <td className="p-3 text-sm font-medium">
                     {transaction.customer.username}
                   </td>
@@ -269,7 +279,7 @@ const Transaction = () => {
                   <td className="p-3 text-sm">
                     Rp {transaction.total_price.toLocaleString("id-ID")}
                   </td>
-                  <td className="p-3 text-sm text-right">
+                  <td className="p-3 text-sm text-right relative">
                     <button
                       className="inline-flex items-center justify-center cursor-pointer p-1 rounded-full hover:bg-gray-100"
                       onClick={() => toggleDropdown(transaction._id)}

@@ -53,7 +53,7 @@ const Login = () => {
   };
 
   return (
-    <main className="py-4 md:py-6 lg:py-8 paddingContainer min-h-screen grid grid-cols-2 gap-5">
+    <main className="py-4 md:py-6 lg:py-8 paddingContainer min-h-screen grid grid-cols-1 md:grid-cols-2 gap-5">
       <div className="w-full h-full relative flex items-center justify-center max-w-[500px] mx-auto">
         <header className="flex gap-3 absolute top-0 left-0">
           <img src="/logo.svg" alt="logo" className="size-8" />
@@ -61,12 +61,12 @@ const Login = () => {
             Kasir Kita
           </h1>
         </header>
-        <div className="flex flex-col gap-[40px] w-full mt-[50px]">
+        <div className="flex flex-col gap-[30px] md:gap-[40px] w-full mt-[50px]">
           <div className="space-y-1">
-            <h1 className="text-4xl font-semibold text-primary-950">
+            <h1 className="text-3xl md:text-4xl font-semibold text-primary-950">
               Masuk ke Akun Anda
             </h1>
-            <p className="text-gray-400">
+            <p className="text-gray-400 text-sm md:text-base">
               Selamat datang kembali! Silakan masuk ke akun Anda
             </p>
           </div>
@@ -99,8 +99,12 @@ const Login = () => {
           </p>
         </div>
       </div>
-      <div className="w-full rounded-3xl h-full flex items-center justify-center bg-[#FAFAFA]">
-        <img src={loginIllus} alt="login-illustration" className="size-80" />
+      <div className="w-full rounded-3xl h-full hidden md:flex items-center justify-center bg-[#FAFAFA]">
+        <img
+          src={loginIllus}
+          alt="login-illustration"
+          className="w-4/5 max-w-[320px] md:size-80"
+        />
       </div>
     </main>
   );
