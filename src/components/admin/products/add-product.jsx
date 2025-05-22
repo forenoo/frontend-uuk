@@ -96,7 +96,7 @@ const AddProduct = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      <header className="flex items-center justify-between bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-5">
+      <header className="flex items-center justify-between bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5">
         <div className="flex items-center gap-4">
           <Link
             to="/products"
@@ -133,7 +133,7 @@ const AddProduct = () => {
         </div>
       </header>
 
-      <div className="bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-6 flex flex-col">
+      <div className="bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-6 flex flex-col">
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg">
             {error}

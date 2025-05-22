@@ -18,21 +18,23 @@ const UserLayout = () => {
     return <Navigate to="/login" />;
   }
 
-  if (role !== "user" && pathname === "/") {
+  if (role !== "user" && pathname === "/customer") {
     return <Navigate to="/dashboard" />;
   }
 
   return (
     <div className="flex min-h-dvh bg-gray-50">
       <aside className="w-64 h-dvh fixed top-0 left-0 hidden lg:flex border-r border-gray-200 flex-col bg-white">
-        <header className="flex gap-2 items-center pl-4 h-[4rem] border-b border-gray-200">
+        <header className="flex gap-2 items-center pl-4 h-[74px] border-b border-gray-200">
           <img src="/logo.svg" alt="logo" className="size-8" />
-          <h1 className="text-2xl text-primary-950 font-semibold">Kiro</h1>
+          <h1 className="text-2xl text-primary-950 font-semibold">
+            Kasir Kita
+          </h1>
         </header>
         <nav className="flex p-4">
           <ul className="flex flex-col w-full">
             {userNavItems.map((item) => {
-              const isActive = pathname === item.path;
+              const isActive = pathname.includes(item.path);
               return (
                 <li key={item.path} className="w-full">
                   <Link
@@ -64,7 +66,7 @@ const UserLayout = () => {
           </button>
         </footer>
       </aside>
-      <main className="lg:ml-64 p-5 w-full">
+      <main className="lg:ml-64 w-full">
         <Outlet />
       </main>
     </div>

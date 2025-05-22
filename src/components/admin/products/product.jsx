@@ -81,7 +81,7 @@ const Product = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      <header className="flex justify-between items-center bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-5">
+      <header className="flex justify-between items-center bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5">
         <h1 className="text-2xl font-medium text-primary-950">Daftar Produk</h1>
         <div className="flex items-center gap-2">
           <form onSubmit={handleSearch} className="flex items-center gap-2">
@@ -102,7 +102,7 @@ const Product = () => {
           </Button>
         </div>
       </header>
-      <div className="bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-5 flex flex-col">
+      <div className="bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5 flex flex-col">
         {loading ? (
           <div className="flex justify-center items-center py-10">
             <Loader2 className="size-8 animate-spin text-primary-500" />

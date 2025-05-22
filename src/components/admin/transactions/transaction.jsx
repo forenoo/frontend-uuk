@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { Ellipsis, Eye, Trash2 } from "lucide-react";
+import { Ellipsis, Eye, Printer, Trash2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { transactionMockData } from "../../../lib/mockdata";
 import { client } from "../../../lib/axios-instance";
+import Button from "../../ui/button";
+import { jsPDF } from "jspdf";
 
 const Transaction = () => {
   const navigate = useNavigate();
@@ -36,16 +38,161 @@ const Transaction = () => {
     if (isConfirmed) {
       try {
         await client.delete(`/transactions/${id}`);
-        // Remove the deleted transaction from the state
         setTransactions(
           transactions.filter((transaction) => transaction._id !== id)
         );
-        setActiveDropdown(null); // Close dropdown after deletion
+        setActiveDropdown(null);
       } catch (error) {
         console.error("Error deleting transaction:", error);
         alert("Gagal menghapus transaksi");
       }
     }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const generateTransactionsReport = () => {
+    if (!transactions || transactions.length === 0) {
+      alert("Tidak ada data transaksi untuk dibuat laporannya");
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    doc.setProperties({
+      title: "Laporan Daftar Transaksi",
+      subject: "Laporan Transaksi",
+      author: "KasirKita",
+      keywords: "laporan, transaksi",
+      creator: "KasirKita System",
+    });
+
+    const primaryColor = [45, 55, 72];
+    const subtleGray = [240, 240, 240];
+    const textColor = [75, 85, 99];
+    const white = [255, 255, 255];
+
+    // Header
+    doc.setFillColor(...primaryColor);
+    doc.rect(0, 0, 210, 20, "F");
+
+    doc.setTextColor(...white);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("KasirKita", 14, 13);
+
+    doc.setTextColor(...primaryColor);
+    doc.setFontSize(12);
+    doc.text("Laporan Daftar Transaksi", 14, 30);
+    doc.setFontSize(9);
+    doc.text(
+      `Tanggal cetak: ${new Date().toLocaleDateString("id-ID")}`,
+      14,
+      36
+    );
+
+    doc.setDrawColor(...subtleGray);
+    doc.setLineWidth(0.5);
+    doc.line(14, 42, 196, 42);
+
+    const tableY = 50;
+    doc.setDrawColor(...primaryColor);
+    doc.setLineWidth(0.5);
+    doc.line(14, tableY, 196, tableY);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(...primaryColor);
+    doc.text("ID TRANSAKSI", 14, tableY - 4);
+    doc.text("PELANGGAN", 65, tableY - 4);
+    doc.text("TANGGAL", 110, tableY - 4);
+    doc.text("JML ITEM", 150, tableY - 4);
+    doc.text("TOTAL", 196, tableY - 4, { align: "right" });
+
+    let rowY = tableY + 10;
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...textColor);
+
+    doc.setDrawColor(...subtleGray);
+    doc.setLineWidth(0.5);
+
+    const itemsPerPage = 35;
+
+    transactions.forEach((transaction, index) => {
+      if (index > 0 && index % itemsPerPage === 0) {
+        doc.addPage();
+
+        doc.setFillColor(...primaryColor);
+        doc.rect(0, 0, 210, 20, "F");
+
+        doc.setTextColor(...white);
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.text("KasirKita", 14, 13);
+
+        rowY = 40;
+
+        doc.setDrawColor(...primaryColor);
+        doc.line(14, rowY, 196, rowY);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(...primaryColor);
+        doc.text("ID TRANSAKSI", 14, rowY - 4);
+        doc.text("PELANGGAN", 65, rowY - 4);
+        doc.text("TANGGAL", 110, rowY - 4);
+        doc.text("JML ITEM", 150, rowY - 4);
+        doc.text("TOTAL", 196, rowY - 4, { align: "right" });
+
+        rowY += 10;
+      }
+
+      const shortId = transaction._id.substring(0, 8) + "...";
+
+      const customerName =
+        transaction.customer.username.length > 20
+          ? transaction.customer.username.substring(0, 17) + "..."
+          : transaction.customer.username;
+
+      doc.setTextColor(...textColor);
+      doc.setFont("helvetica", "normal");
+      doc.text(shortId, 14, rowY);
+      doc.text(customerName, 65, rowY);
+
+      const txDate = formatDate(transaction.createdAt);
+      doc.text(txDate, 110, rowY);
+
+      doc.text(`${transaction.total_items}`, 150, rowY);
+      doc.text(
+        `Rp ${transaction.total_price.toLocaleString("id-ID")}`,
+        196,
+        rowY,
+        {
+          align: "right",
+        }
+      );
+
+      rowY += 6;
+      doc.line(14, rowY, 196, rowY);
+      rowY += 6;
+    });
+
+    doc.setDrawColor(...subtleGray);
+    doc.setLineWidth(0.5);
+    doc.line(14, 275, 196, 275);
+
+    doc.setTextColor(120, 120, 120);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+
+    doc.save(`laporan-transaksi-${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
   const handleSearch = (e) => {
@@ -64,21 +211,31 @@ const Transaction = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      <header className="flex justify-between items-center bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-5">
+      <header className="flex justify-between items-center bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5">
         <h1 className="text-2xl font-medium text-primary-950">
           Daftar Transaksi
         </h1>
-        <form onSubmit={handleSearch}>
-          <input
-            type="text"
-            placeholder="Cari transaksi"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="max-w-[200px] border text-sm border-gray-300 rounded-lg px-4 py-2"
-          />
-        </form>
+        <div className="flex items-center gap-2">
+          <form onSubmit={handleSearch} className="flex items-center">
+            <input
+              type="text"
+              placeholder="Cari transaksi"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="max-w-[200px] border text-sm border-gray-300 rounded-lg px-4 py-2"
+            />
+          </form>
+          <Button
+            type="button"
+            onClick={generateTransactionsReport}
+            className="flex items-center gap-2"
+          >
+            <Printer className="size-4" />
+            Buat Laporan
+          </Button>
+        </div>
       </header>
-      <div className="bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-5 flex flex-col">
+      <div className="bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5 flex flex-col">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 text-left">

@@ -1,16 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Package, Printer } from "lucide-react";
-import { client } from "../../../lib/axios-instance";
-import Button from "../../ui/button";
-import jsPDF from "jspdf";
+import Button from "../ui/button";
+import { client } from "../../lib/axios-instance";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
-const TransactionDetail = () => {
+const UserTransactionDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const fetchTransactionDetail = async () => {
+    try {
+      setLoading(true);
+      const response = await client.get(`/transactions/${id}`);
+      setTransaction(response.data.data);
+    } catch (error) {
+      console.error("Error fetching transaction:", error);
+      setError("Failed to fetch transaction details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactionDetail();
+  }, [id]);
 
   const generatePDF = () => {
     if (!transaction) return;
@@ -146,23 +164,6 @@ const TransactionDetail = () => {
     doc.save(`receipt-${transaction._id}.pdf`);
   };
 
-  useEffect(() => {
-    const fetchTransactionDetail = async () => {
-      try {
-        setLoading(true);
-        const response = await client.get(`/transactions/${id}`);
-        setTransaction(response.data.data);
-      } catch (error) {
-        console.error("Error fetching transaction:", error);
-        setError("Failed to fetch transaction details");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTransactionDetail();
-  }, [id]);
-
   if (loading) {
     return (
       <div className="flex flex-col gap-5">
@@ -236,7 +237,7 @@ const TransactionDetail = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 p-5">
       <header className="flex justify-between items-center bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-4">
@@ -385,4 +386,4 @@ const TransactionDetail = () => {
   );
 };
 
-export default TransactionDetail;
+export default UserTransactionDetail;

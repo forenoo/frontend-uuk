@@ -6,7 +6,7 @@ import { client } from "../lib/axios-instance";
 import { useState } from "react";
 
 const Login = () => {
-  document.title = "Login | Kiro";
+  document.title = "Login | Kasir Kita";
 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -30,13 +30,14 @@ const Login = () => {
       .post("/auth/login", formData)
       .then((res) => {
         const dataToSave = {
+          id: res.data.data.user.id,
           token: res.data.data.token,
           username: res.data.data.user.username,
           role: res.data.data.user.role,
         };
 
         localStorage.setItem("data", JSON.stringify(dataToSave));
-        navigate("/");
+        navigate("/customer");
       })
       .catch((e) => {
         if (e.response && e.response.data && e.response.data.errors) {
@@ -56,7 +57,9 @@ const Login = () => {
       <div className="w-full h-full relative flex items-center justify-center max-w-[500px] mx-auto">
         <header className="flex gap-3 absolute top-0 left-0">
           <img src="/logo.svg" alt="logo" className="size-8" />
-          <h1 className="text-2xl text-primary-950 font-semibold">Kiro</h1>
+          <h1 className="text-2xl text-primary-950 font-semibold">
+            Kasir Kita
+          </h1>
         </header>
         <div className="flex flex-col gap-[40px] w-full mt-[50px]">
           <div className="space-y-1">

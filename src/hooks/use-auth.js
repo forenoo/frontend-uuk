@@ -1,8 +1,9 @@
 export const useAuth = () => {
   const data = JSON.parse(localStorage.getItem("data"));
+  const id = data?.id;
   const token = data?.token;
   const username = data?.username;
   const role = data?.role;
 
-  return { token, username, role };
+  return { token, username, role, id };
 };

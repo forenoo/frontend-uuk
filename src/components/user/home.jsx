@@ -1,52 +1,41 @@
 import { useEffect, useState } from "react";
 import Button from "../ui/button";
-import { ShoppingBagIcon } from "lucide-react";
+import { ShoppingBagIcon, SearchIcon } from "lucide-react";
 import { client } from "../../lib/axios-instance";
+import ProductCard from "./product-card";
+import { useAuth } from "../../hooks/use-auth";
 
 const Home = () => {
+  document.title = "Beranda | Kasir Kita";
+
+  const { id } = useAuth();
+
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [activeCategory, setActiveCategory] = useState({
-    _id: "all",
-    name: "All",
-    icon: "",
-  });
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [cart, setCart] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleFetchCategories = async () => {
-    await client.get("/categories").then((res) => {
-      setCategories(res.data.data);
-    });
+  const fetchProducts = async () => {
+    const res = await client.get("/products");
+    setProducts(res.data.data);
+    setFilteredProducts(res.data.data);
   };
-
-  const allCategories = [
-    {
-      _id: "all",
-      name: "All",
-      icon: "",
-    },
-    ...categories,
-  ];
 
   useEffect(() => {
-    handleFetchCategories();
+    fetchProducts();
   }, []);
 
-  const addToCart = (product) => {
-    const existingItem = cart.find((item) => item.id === product.id);
-
-    if (existingItem) {
-      setCart(
-        cart.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      );
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredProducts(products);
     } else {
-      setCart([...cart, { ...product, quantity: 1 }]);
+      const filtered = products.filter((product) =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredProducts(filtered);
     }
-  };
+  }, [searchTerm, products]);
 
   const cartTotal = cart.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -61,122 +50,196 @@ const Home = () => {
     }).format(price);
   };
 
+  const handleCheckout = async () => {
+    try {
+      setIsProcessing(true);
+
+      const transactionData = {
+        customer_id: id,
+        total_price: cartTotal,
+        products: cart.map((item) => ({
+          product_id: item.id || item._id,
+          quantity: item.quantity,
+          subtotal: item.price * item.quantity,
+        })),
+      };
+
+      const response = await client.post("/transactions", transactionData);
+
+      if (response.status === 200 || response.status === 201) {
+        alert("Transaction successful!");
+        setCart([]);
+      }
+    } catch (error) {
+      console.error("Transaction failed:", error);
+      alert("Transaction failed. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
-    <>
-      <div className="flex-1 pr-64">
-        <div className="flex space-x-2 mb-5 overflow-x-auto">
-          {allCategories.map((category) => (
-            <button
-              key={category._id}
-              onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 text-sm hover:cursor-pointer rounded-full whitespace-nowrap ${
-                activeCategory._id === category._id
-                  ? "bg-primary-500 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {category.icon} {category.name}
-            </button>
-          ))}
+    <div className="flex h-dvh">
+      <div className="flex flex-col flex-1 h-full overflow-hidden">
+        <div className="sticky top-0 p-4 border-b border-gray-200 bg-white z-10">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Cari produk..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full py-2 pl-10 pr-10 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <SearchIcon className="h-5 w-5 text-gray-400" />
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white rounded-lg overflow-hidden border border-gray-200"
-            >
-              <div className="h-40 overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-medium text-gray-800">{product.name}</h3>
-                  <span className="font-medium text-primary-500">
-                    {formatPrice(product.price)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center my-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs bg-gray-100 rounded-full px-2 py-1 text-gray-600">
-                      {product.category}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      Stock: {product.stock}
-                    </span>
-                  </div>
-                </div>
-                <Button onClick={() => addToCart(product)}>
-                  Tambahkan ke Keranjang
-                </Button>
-              </div>
+        <div className="p-4 flex-1 overflow-y-auto">
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-10">
+              <p className="text-gray-500">
+                No products found matching your search
+              </p>
             </div>
-          ))}
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+              {filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.id || product._id}
+                  product={product}
+                  cart={cart}
+                  setCart={setCart}
+                  formatPrice={formatPrice}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      <aside className="w-64 h-dvh fixed top-0 right-0 border-l border-gray-200 bg-white flex flex-col">
-        <div className="p-4 border-b border-gray-100">
-          <h2 className="font-medium">
-            Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)} items)
+      <aside className="w-80 h-dvh border-l border-gray-200 bg-white flex flex-col overflow-hidden">
+        <header className="p-4 h-[74px] border-b border-gray-200 bg-gray-50">
+          <h2 className="font-medium flex items-center gap-2">
+            Detail Pesanan
           </h2>
-        </div>
+          <p className="text-xs text-gray-400">
+            {new Date()
+              .toLocaleDateString("id-ID", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+              .replace("pukul", "")}
+          </p>
+        </header>
 
         {cart.length === 0 ? (
-          <div className="p-6 text-center text-gray-500 flex-grow flex items-center justify-center">
-            <div>
-              <ShoppingBagIcon className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-              <p>Keranjang Anda kosong</p>
+          <div className="p-4 text-center flex-grow flex items-center justify-center">
+            <div className="space-y-3">
+              <ShoppingBagIcon className="w-12 h-12 mx-auto text-gray-300" />
+              <div>
+                <p className="font-medium">Keranjang Anda kosong</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Add items to get started
+                </p>
+              </div>
             </div>
           </div>
         ) : (
           <>
-            <div className="flex-grow overflow-y-auto divide-y divide-gray-100">
+            <div className="flex-grow overflow-y-auto">
               {cart.map((item) => (
                 <div
                   key={item.id}
-                  className="p-3 flex justify-between items-center"
+                  className="flex justify-between items-center p-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-md overflow-hidden">
+                  <div className="flex gap-3 w-full">
+                    <div className="w-16 h-16 rounded-md overflow-hidden border border-gray-200 shadow-sm flex-shrink-0">
                       <img
-                        src={item.image}
+                        src={`http://localhost:8000${item.image_url}`}
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div>
                       <h4 className="text-sm font-medium">{item.name}</h4>
-                      <p className="text-xs text-gray-500">
-                        {formatPrice(item.price)} × {item.quantity}
+                      <p className="text-xs text-gray-500 mt-1">
+                        <span className="font-medium text-primary-500">
+                          {formatPrice(item.price * item.quantity)}
+                        </span>
                       </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <button
+                          className="w-6 h-6 flex items-center hover:cursor-pointer justify-center rounded border border-gray-200 hover:bg-gray-200 text-gray-700"
+                          onClick={() => {
+                            setCart((prev) =>
+                              prev
+                                .map((cartItem) =>
+                                  cartItem.id === item.id &&
+                                  cartItem.quantity > 0
+                                    ? {
+                                        ...cartItem,
+                                        quantity: cartItem.quantity - 1,
+                                      }
+                                    : cartItem
+                                )
+                                .filter((cartItem) => cartItem.quantity > 0)
+                            );
+                          }}
+                        >
+                          -
+                        </button>
+                        <span className="text-xs font-medium">
+                          {item.quantity}
+                        </span>
+                        <button
+                          className="w-6 h-6 flex items-center hover:cursor-pointer justify-center rounded border border-gray-200 hover:bg-gray-200 text-gray-700"
+                          onClick={() => {
+                            setCart((prev) =>
+                              prev.map((cartItem) =>
+                                cartItem.id === item.id
+                                  ? {
+                                      ...cartItem,
+                                      quantity: cartItem.quantity + 1,
+                                    }
+                                  : cartItem
+                              )
+                            );
+                          }}
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <span className="font-medium">
-                    {formatPrice(item.price * item.quantity)}
-                  </span>
                 </div>
               ))}
             </div>
 
-            <div className="p-4 bg-gray-50 flex justify-between items-center">
-              <span className="font-medium">Total:</span>
-              <span className="font-bold text-primary-600">
-                {formatPrice(cartTotal)}
-              </span>
-            </div>
+            <div className="border-t border-gray-200 p-4 bg-gray-50">
+              <div className="flex justify-between items-center mb-4">
+                <span className="font-medium text-base">Total:</span>
+                <span className="font-semibold text-base text-primary-600">
+                  {formatPrice(cartTotal)}
+                </span>
+              </div>
 
-            <div className="p-4">
-              <Button>Proceed to Checkout</Button>
+              <Button
+                className="w-full py-2.5"
+                onClick={handleCheckout}
+                disabled={isProcessing}
+              >
+                {isProcessing ? "Processing..." : "Proceed to Checkout"}
+              </Button>
             </div>
           </>
         )}
       </aside>
-    </>
+    </div>
   );
 };
 

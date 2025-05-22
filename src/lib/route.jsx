@@ -15,6 +15,7 @@ import UserLayout from "../components/layout/user-layout";
 import AuthLayout from "../components/layout/auth-layout";
 import Home from "../components/user/home";
 import HistoryTransaction from "../components/user/history-transaction";
+import UserTransactionDetail from "../components/user/user-transaction-detail";
 
 export const routes = createBrowserRouter([
   {
@@ -75,12 +76,16 @@ export const routes = createBrowserRouter([
     element: <UserLayout />,
     children: [
       {
-        path: "/",
+        path: "/customer",
         element: <Home />,
       },
       {
         path: "/history",
         element: <HistoryTransaction />,
+      },
+      {
+        path: "/history/:id",
+        element: <UserTransactionDetail />,
       },
     ],
   },

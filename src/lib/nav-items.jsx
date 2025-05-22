@@ -32,7 +32,7 @@ export const userNavItems = [
   {
     icon: <HomeIcon className="size-4" />,
     label: "Beranda",
-    path: "/",
+    path: "/customer",
   },
   {
     icon: <ShoppingCartIcon className="size-4" />,

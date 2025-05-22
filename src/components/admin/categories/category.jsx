@@ -64,32 +64,47 @@ const Category = () => {
     fetchCategories();
   }, [location.search]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setActiveDropdown(null);
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col gap-5">
-      <header className="flex justify-between items-center bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-5">
-        <h1 className="text-2xl font-medium text-primary-950">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-4 sm:p-5">
+        <h1 className="text-xl sm:text-2xl font-medium text-primary-950">
           Kategori Produk
         </h1>
-        <div className="flex items-center gap-2">
-          <form onSubmit={handleSearch} className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+          <form
+            onSubmit={handleSearch}
+            className="flex items-center gap-2 w-full sm:w-auto"
+          >
             <input
               type="text"
               placeholder="Cari kategori"
               value={searchQuery}
               onChange={handleSearchChange}
-              className="max-w-[200px] border text-sm border-gray-300 rounded-lg px-4 py-2"
+              className="w-full sm:max-w-[200px] border text-sm border-gray-300 rounded-lg px-4 py-2"
             />
           </form>
           <Button
             onClick={() => navigate("/categories/add")}
-            className="!w-fit flex items-center gap-2"
+            className="!w-full sm:!w-fit flex items-center justify-center gap-2"
           >
             <Plus className="size-4" />
             Tambah Kategori
           </Button>
         </div>
       </header>
-      <div className="bg-white shadow-[0px_2px_2px_rgba(0,0,0,0.05)] rounded-xl p-5 flex flex-col">
+      <div className="bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-4 sm:p-5 flex flex-col">
         {loading ? (
           <div className="flex justify-center items-center py-10">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
@@ -97,23 +112,23 @@ const Category = () => {
         ) : error ? (
           <div className="text-center text-red-500 py-5">{error}</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <table className="w-full min-w-[600px]">
               <thead className="bg-gray-50 text-left">
                 <tr>
-                  <th className="p-3 text-sm font-medium text-gray-500 rounded-tl-lg">
+                  <th className="p-3 text-xs sm:text-sm font-medium text-gray-500 rounded-tl-lg">
                     Ikon
                   </th>
-                  <th className="p-3 text-sm font-medium text-gray-500">
+                  <th className="p-3 text-xs sm:text-sm font-medium text-gray-500">
                     Nama
                   </th>
-                  <th className="p-3 text-sm font-medium text-gray-500">
+                  <th className="p-3 text-xs sm:text-sm font-medium text-gray-500">
                     Total Produk
                   </th>
-                  <th className="p-3 text-sm font-medium text-gray-500">
+                  <th className="p-3 text-xs sm:text-sm font-medium text-gray-500">
                     Status
                   </th>
-                  <th className="p-3 text-sm font-medium text-gray-500 rounded-tr-lg text-right">
+                  <th className="p-3 text-xs sm:text-sm font-medium text-gray-500 rounded-tr-lg text-right">
                     Aksi
                   </th>
                 </tr>
@@ -125,42 +140,47 @@ const Category = () => {
                     className="hover:bg-gray-50 text-primary-950"
                   >
                     <td className="p-3 text-lg">{category.icon}</td>
-                    <td className="p-3 text-sm">{category.name}</td>
-                    <td className="p-3 text-sm">
+                    <td className="p-3 text-xs sm:text-sm">{category.name}</td>
+                    <td className="p-3 text-xs sm:text-sm">
                       {category.total_product || 0}
                     </td>
-                    <td className="p-3 text-sm">
+                    <td className="p-3 text-xs sm:text-sm">
                       {category.status === "active" ? (
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          <span className="text-sm text-green-500">Aktif</span>
+                          <span className="text-xs sm:text-sm text-green-500">
+                            Aktif
+                          </span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                          <span className="text-sm text-red-500">
+                          <span className="text-xs sm:text-sm text-red-500">
                             Tidak Aktif
                           </span>
                         </div>
                       )}
                     </td>
-                    <td className="p-3 text-sm text-right">
+                    <td className="p-3 text-xs sm:text-sm text-right relative">
                       <button
                         className="inline-flex items-center justify-center cursor-pointer p-1 rounded-full hover:bg-gray-100"
-                        onClick={() => toggleDropdown(category._id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleDropdown(category._id);
+                        }}
                       >
                         <Ellipsis className="size-5 text-primary-500" />
                       </button>
 
                       {activeDropdown === category._id && (
-                        <div className="absolute right-8 z-10 mt-1 bg-white rounded-lg shadow-lg border border-gray-200">
-                          <ul className="py-1 text-sm text-primary-950 divide-y divide-gray-200">
+                        <div className="absolute right-2 sm:right-8 z-10 mt-1 bg-white rounded-lg shadow-lg border border-gray-200">
+                          <ul className="py-1 text-xs sm:text-sm text-primary-950 divide-y divide-gray-200">
                             <li>
                               <button
                                 onClick={() =>
                                   navigate(`/categories/edit/${category._id}`)
                                 }
-                                className="px-4 py-2 hover:bg-gray-100 w-full text-left flex items-center gap-2"
+                                className="px-4 py-2 hover:bg-gray-100 w-full text-left flex items-center gap-2 whitespace-nowrap"
                               >
                                 <Pencil className="size-4" />
                                 Ubah
@@ -169,7 +189,7 @@ const Category = () => {
                             <li>
                               <button
                                 onClick={() => handleDelete(category._id)}
-                                className="px-4 py-2 hover:bg-red-50 text-red-500 w-full text-left flex items-center gap-2"
+                                className="px-4 py-2 hover:bg-red-50 text-red-500 w-full text-left flex items-center gap-2 whitespace-nowrap"
                               >
                                 <Trash2 className="size-4" />
                                 Hapus
@@ -185,7 +205,7 @@ const Category = () => {
                   <tr>
                     <td
                       colSpan="5"
-                      className="p-3 text-sm text-center text-gray-500"
+                      className="p-3 text-xs sm:text-sm text-center text-gray-500"
                     >
                       Tidak ada kategori yang tersedia
                     </td>
