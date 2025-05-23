@@ -40,7 +40,7 @@ const ProductCard = ({ product, cart, setCart, formatPrice }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm transition-all hover:shadow-md">
+    <div className="bg-white rounded-xl overflow-hidden border border-gray-200 transition-all">
       <div className="h-32 sm:h-40 overflow-hidden relative">
         <img
           src={`http://localhost:8000${product.image_url}`}
