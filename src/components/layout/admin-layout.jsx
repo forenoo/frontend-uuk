@@ -45,7 +45,6 @@ const AdminLayout = () => {
 
   return (
     <div className="flex min-h-dvh bg-gray-50">
-      {/* Desktop Sidebar */}
       <aside className="w-64 h-dvh fixed top-0 left-0 hidden lg:flex border-r border-gray-200 flex-col bg-white z-30">
         <header className="flex gap-2 items-center pl-4 h-[4rem] border-b border-gray-200">
           <img src="/logo.svg" alt="logo" className="size-8" />
@@ -89,7 +88,6 @@ const AdminLayout = () => {
         </footer>
       </aside>
 
-      {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -97,7 +95,6 @@ const AdminLayout = () => {
         />
       )}
 
-      {/* Mobile Sidebar */}
       <aside
         className={`w-64 h-dvh fixed top-0 left-0 flex flex-col bg-white z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
@@ -156,7 +153,6 @@ const AdminLayout = () => {
       </aside>
 
       <div className="w-full">
-        {/* Desktop Header */}
         <header className="hidden lg:flex fixed w-full top-0 left-64 bg-white gap-3 items-center pl-4 h-[4rem] border-b border-gray-200">
           <h1 className="text-xl text-primary-500 font-semibold">
             {pathname.includes("/dashboard")
@@ -169,7 +165,6 @@ const AdminLayout = () => {
           </h1>
         </header>
 
-        {/* Mobile Header */}
         <header className="flex lg:hidden fixed w-full top-0 z-20 bg-white justify-between items-center px-4 h-[4rem] border-b border-gray-200">
           <div className="flex items-center gap-2">
             <button

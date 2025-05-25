@@ -26,7 +26,6 @@ const UserLayout = () => {
 
   return (
     <div className="flex min-h-dvh bg-gray-50">
-      {/* Mobile Header */}
       <header className="fixed top-0 left-0 w-full bg-white border-b border-gray-200 h-14 flex items-center justify-between px-4 lg:hidden z-20">
         <div className="flex items-center gap-2">
           <button
@@ -40,7 +39,6 @@ const UserLayout = () => {
         </div>
       </header>
 
-      {/* Mobile Sidebar Overlay */}
       {showMobileSidebar && (
         <div
           className="fixed inset-0 bg-black/70 z-30 lg:hidden"
@@ -48,7 +46,6 @@ const UserLayout = () => {
         ></div>
       )}
 
-      {/* Desktop Sidebar */}
       <aside className="w-64 h-dvh fixed top-0 left-0 hidden lg:flex border-r border-gray-200 flex-col bg-white z-40">
         <header className="flex gap-2 items-center pl-4 h-[74px] border-b border-gray-200">
           <img src="/logo.svg" alt="logo" className="size-8" />
@@ -92,7 +89,6 @@ const UserLayout = () => {
         </footer>
       </aside>
 
-      {/* Mobile Sidebar */}
       <aside
         className={`w-64 h-dvh fixed top-0 left-0 flex lg:hidden border-r border-gray-200 flex-col bg-white z-40 transform transition-transform duration-300 ${
           showMobileSidebar ? "translate-x-0" : "-translate-x-full"

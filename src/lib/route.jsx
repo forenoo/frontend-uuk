@@ -16,8 +16,13 @@ import AuthLayout from "../components/layout/auth-layout";
 import Home from "../components/user/home";
 import HistoryTransaction from "../components/user/history-transaction";
 import UserTransactionDetail from "../components/user/user-transaction-detail";
+import RootPage from "../components/rootpage";
 
 export const routes = createBrowserRouter([
+  {
+    path: "/",
+    element: <RootPage />,
+  },
   {
     element: <AuthLayout />,
     children: [

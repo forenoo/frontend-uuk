@@ -3,6 +3,30 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../../hooks/use-auth";
 import { useEffect, useState } from "react";
 import { client } from "../../../lib/axios-instance";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+
+// Custom tooltip component
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-3 border border-gray-200 shadow-sm rounded-lg">
+        <p className="text-sm text-gray-600">Tanggal: {label}</p>
+        <p className="text-sm font-medium text-primary-500">
+          Total Pelanggan: {payload[0].value}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 const Dashboard = () => {
   document.title = "Dashboard | Admin";
@@ -12,6 +36,7 @@ const Dashboard = () => {
   const [overview, setOverview] = useState();
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [newestProducts, setNewestProducts] = useState([]);
+  const [customerGrowth, setCustomerGrowth] = useState([]);
 
   const handleFetchOverview = async () => {
     await client.get("/overview").then((res) => {
@@ -31,10 +56,17 @@ const Dashboard = () => {
     });
   };
 
+  const handleFetchCustomerGrowth = async () => {
+    await client.get("/overview/customer-growth").then((res) => {
+      setCustomerGrowth(res.data.data);
+    });
+  };
+
   useEffect(() => {
     handleFetchOverview();
     handleFetchRecentTransactions();
     handleFetchRecentProducts();
+    handleFetchCustomerGrowth();
   }, []);
 
   // Format ISO date to readable format
@@ -56,7 +88,6 @@ const Dashboard = () => {
         </h1>
       </header>
 
-      {/* Stats Cards - 1 column on mobile, 2 on medium, 4 on large screens */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         <div className="bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl flex items-center gap-4 p-4 sm:p-5">
           <div className="bg-primary-500/10 rounded-full p-2">
@@ -104,9 +135,39 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Transactions and Products - Stack vertically on mobile, side by side on larger screens */}
+      <div className="bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-4 sm:p-5">
+        <h2 className="text-base sm:text-lg font-semibold text-primary-950 mb-4">
+          Pertumbuhan Pelanggan
+        </h2>
+        <div className="w-full h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={customerGrowth}
+              margin={{
+                top: 10,
+                right: 30,
+                left: 0,
+                bottom: 0,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="totalCustomers"
+                stroke="#12b76f"
+                fill="#12b76f"
+                fillOpacity={0.1}
+                name="Total Pelanggan"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Transactions Section */}
         <div className="lg:col-span-7 bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-4 sm:p-5 flex flex-col">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-base sm:text-lg font-semibold text-primary-950">
@@ -173,7 +234,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Products Section */}
         <div className="lg:col-span-5 bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-4 sm:p-5 flex flex-col">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-base sm:text-lg font-semibold text-primary-950">

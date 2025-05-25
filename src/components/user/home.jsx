@@ -137,7 +137,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Desktop sidebar cart */}
       <aside className="hidden lg:flex w-80 h-dvh border-l border-gray-200 bg-white flex-col overflow-hidden">
         <header className="p-4 h-[74px] border-b border-gray-200 bg-white">
           <h2 className="font-medium flex items-center gap-2">
@@ -259,7 +258,6 @@ const Home = () => {
         )}
       </aside>
 
-      {/* Mobile cart overlay */}
       <div
         className={`lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex transition-opacity duration-300 ease-in-out ${
           showMobileCart ? "opacity-100" : "opacity-0 pointer-events-none"

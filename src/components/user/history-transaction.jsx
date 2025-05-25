@@ -62,7 +62,6 @@ const HistoryTransaction = () => {
         </form>
       </header>
 
-      {/* Desktop view - Table */}
       <div className="hidden sm:flex bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-5 flex-col">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -120,7 +119,6 @@ const HistoryTransaction = () => {
         </div>
       </div>
 
-      {/* Mobile view - Now table instead of cards */}
       <div className="sm:hidden bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-xl p-3 flex-col">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[500px]">
