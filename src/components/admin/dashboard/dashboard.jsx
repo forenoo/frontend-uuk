@@ -13,7 +13,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Custom tooltip component
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -69,7 +68,6 @@ const Dashboard = () => {
     handleFetchCustomerGrowth();
   }, []);
 
-  // Format ISO date to readable format
   const formatDate = (isoString) => {
     const date = new Date(isoString);
     return date.toLocaleDateString("id-ID", {

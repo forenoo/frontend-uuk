@@ -81,7 +81,6 @@ const Transaction = () => {
     const textColor = [75, 85, 99];
     const white = [255, 255, 255];
 
-    // Header
     doc.setFillColor(...primaryColor);
     doc.rect(0, 0, 210, 20, "F");
 

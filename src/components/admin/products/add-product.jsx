@@ -63,10 +63,8 @@ const AddProduct = () => {
     setError(null);
 
     try {
-      // Create a FormData object for file upload
       const productFormData = new FormData();
 
-      // Add text fields to FormData
       productFormData.append("name", formData.name);
       productFormData.append("price", formData.price);
       productFormData.append("stock", formData.stock);

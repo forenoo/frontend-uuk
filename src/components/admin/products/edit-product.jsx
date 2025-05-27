@@ -82,7 +82,6 @@ const EditProduct = () => {
           image_url: product.image_url,
         });
 
-        // Set image preview with the full URL
         setImagePreview(`http://localhost:8000${product.image_url}`);
       }
     } catch (error) {
@@ -111,7 +110,6 @@ const EditProduct = () => {
       formDataToSend.append("type", formData.type);
       formDataToSend.append("category_id", formData.category_id);
 
-      // Only add image if a new one was selected
       if (newImage) {
         formDataToSend.append("image", newImage);
       }
